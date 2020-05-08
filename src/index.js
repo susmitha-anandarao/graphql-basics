@@ -4,19 +4,47 @@ import {
 
 // Scalar types - String, Boolean, Int, Float, Id
 
+// Demo user data
+const users = [{
+    id: '1',
+    name: 'Susie',
+    email: 'susie@example.com',
+    age: 29
+}, {
+    id: '2',
+    name: 'Aj',
+    email: 'aj@example.com'
+}, {
+    id: '3',
+    name: 'Su',
+    email: 'su@example.com'
+}]
+
+// Demo post data
+const posts = [{
+    id: '1',
+    title: 'Title 1',
+    body: '',
+    published: false
+}, {
+    id: '2',
+    title: 'Title 2',
+    body: 'Body 2',
+    published: true
+}, {
+    id: '3',
+    title: 'Title 3',
+    body: 'Body 3',
+    published: false
+}]
+
 // Type definitions - Application Schema
 const typeDefs = `
     type Query {
-        id: ID!
-        title: String!
-        price: Float!
-        releaseYear: Int
-        rating: Float
-        inStock: Boolean!
-        greeting(name: String): String!
-        add(a: Float!, b: Float!): Float!
+        users(query: String): [User!]!
         me: User!
         post: Post!
+        posts(query: String): [Post!]!
     }
 
     type User {
@@ -37,32 +65,13 @@ const typeDefs = `
 // Resolvers - Functions
 const resolvers = {
     Query: {
-        id() {
-            return 'abc12'
-        },
-        title() {
-            return 'iPhone'
-        },
-        price() {
-            return 1234.56
-        },
-        releaseYear() {
-            return 2020
-        },
-        rating() {
-            return null
-        },
-        inStock() {
-            return true
-        },
-        greeting(parent, args, ctx, info) {
-            if(args.name) {
-                return `Hello, ${args.name}!`
+        users(parent, args, ctx, info) {
+            if (!args.query) {
+                return users
             }
-            return 'Hello!'
-        },
-        add(parent, args, ctx, info) {
-            return args.a + args.b
+            return users.filter((user) => {
+                return user.name.toLowerCase().includes(args.query.toLowerCase())
+            })
         },
         me() {
             return {
@@ -78,6 +87,14 @@ const resolvers = {
                 body: 'Some body about node',
                 published: false
             }
+        },
+        posts(parent, args, ctx, info) {
+            if (!args.query) {
+                return posts
+            }
+            return posts.filter((post) => {
+                return post.title.toLowerCase().includes(args.query.toLowerCase()) || post.body.toLowerCase().includes(args.query.toLowerCase())
+            })
         }
     }
 }
